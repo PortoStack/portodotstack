@@ -61,7 +61,7 @@ export function Sidebar() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <Image
-            src={"/images/profile.jpg"}
+            src={"/images/profile.png"}
             alt="PT"
             loading="eager"
             width={128}
