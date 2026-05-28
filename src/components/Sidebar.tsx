@@ -12,7 +12,6 @@ export function Sidebar() {
   const items = [
     { label: "Home", section: "home", icon: "House" },
     { label: "About", section: "about", icon: "User" },
-    { label: "Tech Stack & Skill", section: "skill", icon: "FolderGit2" },
     { label: "Project", section: "project", icon: "Cpu" },
     { label: "Experience", section: "experience", icon: "Briefcase" },
   ];
