@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   title: "Porto.Stack",
   description: "Software & Robotics Developer Portfolio",
   icons: {
-    icon: "/images/profile.jpg",
+    icon: "/images/profile.png",
   },
 };
 
