@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Project() {
+export function Project() {
   return (
     <section
       id="project"
