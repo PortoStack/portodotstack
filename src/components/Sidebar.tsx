@@ -2,26 +2,26 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/cn";
-import { motion, Variants } from "motion/react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
-import * as Icons from "lucide-react";
+import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { Briefcase, Cpu, House, LucideIcon, User } from "lucide-react";
 import Link from "next/link";
 
 export function Sidebar() {
-  const items = [
-    { label: "Home", section: "home", icon: "House" },
-    { label: "About", section: "about", icon: "User" },
-    { label: "Project", section: "project", icon: "Cpu" },
-    { label: "Experience", section: "experience", icon: "Briefcase" },
+  const items: { label: string; section: string; icon: LucideIcon }[] = [
+    { label: "Home", section: "home", icon: House },
+    { label: "About", section: "about", icon: User },
+    { label: "Project", section: "project", icon: Cpu },
+    { label: "Experience", section: "experience", icon: Briefcase },
   ];
 
   const footer = [
-    { href: "https://github.com/PortoStack", icon: FaGithub },
-    // { href: "https://github.com/PortoStack", icon: FaInstagram },
+    { href: "https://github.com/PortoStack", icon: FaGithub, label: "GitHub" },
     {
       href: "https://www.linkedin.com/in/porto-yospunya-00a3b13a1/",
       icon: FaLinkedin,
+      label: "LinkedIn",
     },
   ];
 
@@ -52,112 +52,133 @@ export function Sidebar() {
 
   return (
     <>
-      <aside className="sticky top-0 hidden w-64 flex-col gap-8 py-12 pl-12 md:flex lg:w-108 lg:py-24 lg:pl-16">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col justify-between py-10 pl-8 md:flex lg:w-96 lg:py-20 lg:pl-16">
         <motion.div
-          className="mx-auto flex flex-col gap-6 pr-16"
+          className="flex flex-col gap-8 pr-8 lg:pr-16"
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <Image
-            src={"/images/profile.png"}
-            alt="PT"
-            loading="eager"
-            width={128}
-            height={128}
-            className="mx-auto h-40 w-40 rounded-full object-cover"
-          />
-          <div className="flex flex-col items-center">
-            <h1 className="text-xl font-bold">Watcharapong Yospunya</h1>
-            <p className="text-muted">@portostack</p>
+          <div className="flex flex-col items-center gap-5">
+            <Image
+              src="/images/profile.png"
+              alt="Watcharapong Yospunya"
+              loading="eager"
+              width={128}
+              height={128}
+              className="border-primary/25 h-28 w-28 rounded-full border object-cover lg:h-36 lg:w-36"
+            />
+            <div className="grid gap-1">
+              <h1 className="text-lg leading-tight font-black lg:text-xl">
+                Watcharapong Yospunya
+              </h1>
+              <p className="text-muted text-center text-sm">@portostack</p>
+            </div>
           </div>
-        </motion.div>
-        <nav className="relative flex flex-1 flex-col">
-          {items.map((item, i) => {
-            const isActive = activeSection === item.section;
 
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: i * 0.25 }}
-              >
-                <button
+          <nav className="relative flex flex-col gap-1">
+            {items.map((item, i) => {
+              const isActive = activeSection === item.section;
+              const Icon = item.icon;
+
+              return (
+                <motion.button
+                  key={item.section}
+                  initial={{ opacity: 0, x: -32 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    duration: 0.55,
+                    ease: "easeOut",
+                    delay: 0.12 + i * 0.08,
+                  }}
                   onClick={() => onScrollToSection(item.section)}
                   className={cn(
-                    "group flex w-full items-center gap-4 py-6 text-left text-xs font-black uppercase lg:text-base",
-                    isActive ? "text-secondary" : "text-muted"
+                    "group relative flex w-full items-center gap-4 rounded-sm px-3 py-4 text-left text-sm font-black uppercase transition-colors",
+                    isActive
+                      ? "text-secondary"
+                      : "text-muted hover:text-foreground"
                   )}
                 >
-                  <span className="text-xl">{"</>"}</span>
-                  <div
-                    className={cn(
-                      "h-0.75 w-0 rounded-lg transition-all group-hover:w-0 lg:group-hover:w-32",
-                      isActive ? "bg-secondary w-0 lg:w-32" : "bg-muted w-0"
-                    )}
-                  />
+                  {isActive && (
+                    <motion.span
+                      layoutId="desktop-active-section"
+                      className="bg-secondary absolute inset-y-2 -left-2 w-1 rounded-full"
+                      transition={{ duration: 0.35, ease: "easeOut" }}
+                    />
+                  )}
+                  <Icon size={20} />
                   {item.label}
-                </button>
-              </motion.div>
-            );
-          })}
-        </nav>
-        <div className="flex gap-8">
-          {footer.map((f, i) => {
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, ease: "easeOut", delay: i * 0.5 }}
-              >
-                <Link href={f.href} target="_blank" rel="noopener noreferrer">
-                  <f.icon
-                    size={36}
-                    className="hover:text-primary transition-colors"
-                  />
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
+                </motion.button>
+              );
+            })}
+          </nav>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-muted"
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.35 }}
+          className="grid gap-5 pr-8 lg:pr-16"
         >
-          &copy; {new Date().getFullYear()} PortoStack. All rights reserved.
+          <div className="flex gap-6">
+            {footer.map((f) => (
+              <Link
+                key={f.label}
+                href={f.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={f.label}
+                title={f.label}
+                className="hover:text-primary transition-all hover:scale-125"
+              >
+                <f.icon size={28} />
+              </Link>
+            ))}
+          </div>
+          <p className="text-muted text-xs leading-5">
+            &copy; {new Date().getFullYear()} PortoStack. All rights reserved.
+          </p>
         </motion.div>
       </aside>
-      <div className="bg-accent absolute bottom-8 left-1/2 z-9999 flex -translate-x-1/2 gap-4 overflow-hidden rounded-lg p-2 md:hidden">
+
+      <motion.nav
+        initial={{ opacity: 0, y: 32, x: "-50%" }}
+        animate={{ opacity: 1, y: 0, x: "-50%" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="border-primary/20 bg-background/90 fixed bottom-5 left-1/2 z-50 flex gap-1 overflow-hidden rounded-lg border p-2 shadow-2xl shadow-black/20 backdrop-blur md:hidden"
+      >
         {items.map((item, i) => {
           const isActive = activeSection === item.section;
-          const Icon = Icons[
-            item.icon as keyof typeof Icons
-          ] as Icons.LucideIcon;
+          const Icon = item.icon;
 
           return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 50 }}
+            <motion.button
+              key={item.section}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut", delay: i * 0.25 }}
+              transition={{ duration: 0.45, ease: "easeOut", delay: i * 0.06 }}
+              onClick={() => onScrollToSection(item.section)}
+              className={cn(
+                "relative flex h-11 w-11 items-center justify-center rounded-sm transition-colors",
+                isActive
+                  ? "text-background"
+                  : "text-muted hover:text-foreground"
+              )}
+              aria-label={item.label}
+              title={item.label}
             >
-              <button
-                onClick={() => onScrollToSection(item.section)}
-                className={cn(
-                  "group flex w-full items-center gap-4 rounded-sm p-2 text-left text-xs font-black uppercase lg:text-base",
-                  isActive ? "text-secondary" : "text-muted"
-                )}
-              >
-                <Icon />
-              </button>
-            </motion.div>
+              {isActive && (
+                <motion.span
+                  layoutId="mobile-active-section"
+                  className="bg-secondary absolute inset-0 rounded-sm"
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                />
+              )}
+              <Icon className="relative z-10" size={20} />
+            </motion.button>
           );
         })}
-      </div>
+      </motion.nav>
     </>
   );
 }
