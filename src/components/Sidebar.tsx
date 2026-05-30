@@ -2,10 +2,19 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/cn";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
-import { Briefcase, Cpu, House, LucideIcon, User } from "lucide-react";
+import { FaGithub, FaInstagram, FaLinkedin } from "react-icons/fa";
+import {
+  Briefcase,
+  Cpu,
+  Ellipsis,
+  House,
+  LucideIcon,
+  Send,
+  Share2,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 
 export function Sidebar() {
@@ -14,6 +23,7 @@ export function Sidebar() {
     { label: "About", section: "about", icon: User },
     { label: "Project", section: "project", icon: Cpu },
     { label: "Experience", section: "experience", icon: Briefcase },
+    { label: "Contact", section: "contact", icon: Send },
   ];
 
   const footer = [
@@ -23,6 +33,11 @@ export function Sidebar() {
       icon: FaLinkedin,
       label: "LinkedIn",
     },
+    {
+      href: "https://www.instagram.com/p.porto_o?igsh=MzBiMmoxdjBnYW56/",
+      icon: FaInstagram,
+      label: "Instagram",
+    },
   ];
 
   const onScrollToSection = (section: string) => {
@@ -31,6 +46,7 @@ export function Sidebar() {
   };
 
   const [activeSection, setActiveSection] = useState("home");
+  const [isSocialOpen, setIsSocialOpen] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -120,7 +136,7 @@ export function Sidebar() {
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.35 }}
           className="grid gap-5 pr-8 lg:pr-16"
         >
-          <div className="flex gap-6">
+          <div className="flex gap-2">
             {footer.map((f) => (
               <Link
                 key={f.label}
@@ -129,7 +145,7 @@ export function Sidebar() {
                 rel="noopener noreferrer"
                 aria-label={f.label}
                 title={f.label}
-                className="hover:text-primary transition-all hover:scale-125"
+                className="hover:text-secondary group relative flex h-12 w-12 items-center justify-center rounded-sm border border-white/10 bg-white/5 transition-colors"
               >
                 <f.icon size={28} />
               </Link>
@@ -145,7 +161,7 @@ export function Sidebar() {
         initial={{ opacity: 0, y: 32, x: "-50%" }}
         animate={{ opacity: 1, y: 0, x: "-50%" }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="border-primary/20 bg-background/90 fixed bottom-5 left-1/2 z-50 flex gap-1 overflow-hidden rounded-lg border p-2 shadow-2xl shadow-black/20 backdrop-blur md:hidden"
+        className="border-primary/20 bg-background/90 fixed bottom-5 left-1/2 z-50 flex gap-1 overflow-visible rounded-lg border p-2 shadow-2xl shadow-black/20 backdrop-blur md:hidden"
       >
         {items.map((item, i) => {
           const isActive = activeSection === item.section;
@@ -178,6 +194,50 @@ export function Sidebar() {
             </motion.button>
           );
         })}
+        <motion.div className="relative">
+          <button
+            type="button"
+            onClick={() => setIsSocialOpen((current) => !current)}
+            className={cn(
+              "relative flex h-11 w-11 items-center justify-center rounded-sm border border-white/10 bg-white/5 transition-colors",
+              isSocialOpen
+                ? "bg-secondary text-background"
+                : "text-muted hover:text-foreground"
+            )}
+            aria-label="Open social links"
+            aria-expanded={isSocialOpen}
+            title="Social links"
+          >
+            <Ellipsis size={20} />
+          </button>
+
+          <AnimatePresence>
+            {isSocialOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 12, scale: 0.96 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                className="border-primary/20 bg-background/95 absolute -right-2 bottom-12 mb-3 grid gap-1 rounded-lg border p-2 shadow-2xl shadow-black/20 backdrop-blur"
+              >
+                {footer.map((f) => (
+                  <Link
+                    key={f.label}
+                    href={f.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={f.label}
+                    title={f.label}
+                    onClick={() => setIsSocialOpen(false)}
+                    className="hover:text-secondary text-muted flex h-11 w-11 items-center justify-center rounded-sm border border-white/10 bg-white/5 transition-colors"
+                  >
+                    <f.icon size={24} />
+                  </Link>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </motion.nav>
     </>
   );
