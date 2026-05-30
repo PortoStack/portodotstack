@@ -1,14 +1,10 @@
 import React from "react";
 import {
   SiArduino,
-  SiCss,
   SiDocker,
-  SiDotnet,
   SiFastapi,
   SiFirebase,
   SiFlutter,
-  SiHtml5,
-  SiJavascript,
   SiMqtt,
   SiMysql,
   SiNestjs,
@@ -19,7 +15,6 @@ import {
   SiTailwindcss,
   SiTypescript,
 } from "react-icons/si";
-import { TbSql } from "react-icons/tb";
 
 export interface ExperienceAttributes {
   id: string;

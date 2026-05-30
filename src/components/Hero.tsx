@@ -2,16 +2,7 @@
 
 import { Download } from "lucide-react";
 import { motion } from "motion/react";
-
-const codeLines = [
-  { text: "const porto = new Developer();", color: "text-secondary" },
-  {
-    text: "porto.stack = ['Next.js', 'Golnag', 'IoT'];",
-    color: "text-primary",
-  },
-  { text: "porto.connect(hardware, software);", color: "text-foreground" },
-  { text: "await porto.ship('clean solutions');", color: "text-secondary" },
-];
+import { codeLines, heroCapabilities } from "@/data/hero";
 
 export function Hero() {
   return (
@@ -31,10 +22,8 @@ export function Hero() {
             Hi, I&apos;m Porto
           </h1>
           <h2 className="text-xl leading-tight font-black sm:text-3xl">
-            {"<"}
             <span className="text-primary">Full Stack Developer</span> {" & "}
             <span className="text-secondary">Hardware Enthusiast</span>
-            {"/>"}
           </h2>
           <p className="text-muted max-w-3xl text-base leading-7 sm:text-xl">
             I am a passionate developer who loves bridging the gap between
@@ -42,8 +31,8 @@ export function Hero() {
             tinkering with microcontrollers, I enjoy turning complex problems
             into elegant solutions.
           </p>
-          <button className="bg-primary hover:bg-primary/50 active:bg-primary/80 mt-2 flex w-fit items-center gap-3 rounded-lg px-4 py-2 transition-colors sm:mt-4">
-            Download Resuma <Download />
+          <button className="hover:bg-primary/50 active:bg-primary/80 flex w-fit items-center gap-3 rounded-sm border border-white/10 bg-white/5 px-4 py-2 transition-colors sm:mt-4">
+            Download Resume <Download />
           </button>
         </div>
 
@@ -74,7 +63,7 @@ export function Hero() {
                 }}
                 className="flex min-h-7 w-max min-w-full items-center gap-3 sm:min-h-8 sm:gap-4"
               >
-                <span className="text-muted w-5 shrink-0 text-right">
+                <span className="w-5 shrink-0 text-right text-[#858585]">
                   {index + 1}
                 </span>
                 <motion.span
@@ -94,9 +83,16 @@ export function Hero() {
                     repeat: Infinity,
                     times: [0, 0.28, 0.84, 1],
                   }}
-                  className={`${line.color} whitespace-nowrap`}
+                  className="whitespace-nowrap"
                 >
-                  {line.text}
+                  {line.tokens.map((token, tokenIndex) => (
+                    <span
+                      key={`${line.text}-${tokenIndex}`}
+                      className={token.color}
+                    >
+                      {token.text}
+                    </span>
+                  ))}
                 </motion.span>
               </motion.div>
             ))}
@@ -104,7 +100,7 @@ export function Hero() {
             <motion.div
               animate={{ opacity: [1, 0, 1] }}
               transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
-              className="bg-secondary mt-2 ml-8 h-4 w-1.5 sm:ml-9 sm:h-5 sm:w-2"
+              className="mt-2 ml-8 h-4 w-1.5 bg-[#AEAFAD] sm:ml-9 sm:h-5 sm:w-2"
             />
           </div>
         </motion.div>
