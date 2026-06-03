@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/Sidebar";
 import { cn } from "@/lib/cn";
 import { CustomCursor } from "@/components/CustomCursor";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Porto.Stack",
@@ -38,6 +39,15 @@ export default function RootLayout({
           </main>
         </div>
         <CustomCursor />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "#333",
+              color: "#fff",
+            },
+          }}
+        />
       </body>
     </html>
   );
