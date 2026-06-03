@@ -2,7 +2,7 @@
 
 import { Download } from "lucide-react";
 import { motion } from "motion/react";
-import { codeLines, heroCapabilities } from "@/data/hero";
+import { codeLines } from "@/data/hero";
 
 export function Hero() {
   return (
