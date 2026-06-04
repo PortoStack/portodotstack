@@ -96,8 +96,8 @@ Deployment is handled by the GitHub Actions workflow in `.github/workflows/deplo
 
 The workflow:
 
-- Runs on pushes to `dev` and `main`
-- Supports manual deployment from `dev` or `main`
+- Runs on pushes to `main`
+- Supports manual production deployment
 - Builds the app before deployment
 - Packages the repository
 - Uploads it to the target server over SSH
