@@ -1,36 +1,172 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+
+<h1 style="text-align: center">Portodotstack Portfolio</h1>
+
+&emsp; &emsp;Personal portfolio website built with Next.js, React, TypeScript, Tailwind CSS, and Resend. The app presents profile, about, projects, experience, and contact sections, with a server-side API route for contact form email delivery.
+
+<h2 style="text-align: center">Tech Stack</h2> 
+
+<p style="display: flex; justify-content: center; gap: 8px;">
+  <img src="https://skillicons.dev/icons?i=nextjs" alt="Next.js" width="42" height="42" />
+  <img src="https://skillicons.dev/icons?i=react" alt="React" width="42" height="42" />
+  <img src="https://skillicons.dev/icons?i=typescript" alt="TypeScript" width="42" height="42" />
+  <img src="https://skillicons.dev/icons?i=tailwind" alt="Tailwind CSS" width="42" height="42" />
+  <img src="https://skillicons.dev/icons?i=docker" alt="Docker" width="42" height="42" />
+</p>
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a local environment file:
+
+```bash
+touch .env.local
+```
+
+Add the variables listed in the Environment Variables section.
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:4000](http://localhost:4000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_API_VERSION=v1
+RESEND_API_KEY=your_resend_api_key
+```
 
-## Learn More
+`RESEND_API_KEY` is required for the contact form API route at `/api/v1/email`.
 
-To learn more about Next.js, take a look at the following resources:
+## Available Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Runs the local development server on port `4000`.
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Builds the production application.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run start
+```
+
+Starts the production server after a successful build.
+
+```bash
+npm run lint
+```
+
+Runs ESLint.
+
+## Docker
+
+Build and run the app with Docker Compose:
+
+```bash
+docker compose up -d --build
+```
+
+The container exposes the app at [http://localhost:4000](http://localhost:4000).
+
+Stop the container:
+
+```bash
+docker compose down
+```
+
+## Deployment
+
+Deployment is handled by the GitHub Actions workflow in `.github/workflows/deploy.yml`.
+
+The workflow:
+
+- Runs on pushes to `main`
+- Supports manual production deployment
+- Builds the app before deployment
+- Packages the repository
+- Uploads it to the target server over SSH
+- Runs `docker compose up -d --build --remove-orphans`
+
+Required GitHub environment secrets:
+
+- `SSH_HOST`
+- `SSH_USER`
+- `SSH_KEY`
+
+Optional secrets:
+
+- `SSH_PORT`
+- `DEPLOY_PATH`
+- `SERVER_NAME`
+- `HTTP_PORT`
+- `ENV_FILE`
+
+## Project Structure
+
+```text
+.
+├── public
+│   └── images
+│       ├── projects
+│       ├── about.png
+│       └── profile.png
+└── src
+    ├── app
+    │   ├── api
+    │   │   └── v1
+    │   │       └── email
+    │   ├── globals.css
+    │   ├── layout.tsx
+    │   └── page.tsx
+    ├── components
+    ├── config
+    ├── data
+    ├── emails
+    ├── lib
+    ├── schema
+    └── services
+```
+
+## Contact API
+
+The contact form sends a `POST` request to:
+
+```text
+/api/v1/email
+```
+
+Request body:
+
+```json
+{
+  "name": "Your Name",
+  "email": "you@example.com",
+  "message": "Your message"
+}
+```
+
+Successful responses return status `201` with `success: true`.
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+Built by PortoStack using Next.js & Tailwind CSS
