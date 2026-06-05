@@ -3,119 +3,32 @@ name: Deploy
 on:
   push:
     branches:
-      - dev
       - main
   workflow_dispatch:
-    inputs:
-      branch:
-        description: Branch to deploy
-        required: true
-        default: dev
-        type: choice
-        options:
-          - dev
-          - main
 
 jobs:
   deploy:
-    name: Deploy ${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'production' || 'preview' }}
     runs-on: ubuntu-latest
-    environment: ${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'production' || 'preview' }}
-    concurrency:
-      group: deploy-${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'production' || 'preview' }}
-      cancel-in-progress: false
-
-    env:
-      DEPLOY_ENV: ${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'production' || 'preview' }}
-      DEFAULT_SERVER_NAME: ${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'portostack.nerasuan-devs.com' || 'preview.portostack.nerasuan-devs.com' }}
-      COMPOSE_PROJECT_NAME: ${{ (((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && 'portodotstack-production' || 'portodotstack-preview' }}
-      SSH_HOST: ${{ secrets.SSH_HOST }}
-      SSH_USER: ${{ secrets.SSH_USER }}
-      SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
-      SSH_KEY: ${{ secrets.SSH_KEY }}
-      DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || ((((github.event_name == 'workflow_dispatch') && (inputs.branch == 'main')) || ((github.event_name != 'workflow_dispatch') && (github.ref_name == 'main'))) && '/opt/portodotstack-production' || '/opt/portodotstack-preview') }}
-      SERVER_NAME: ${{ secrets.SERVER_NAME }}
-      HTTP_PORT: ${{ secrets.HTTP_PORT || '80' }}
-      ENV_FILE: ${{ secrets.ENV_FILE }}
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.branch || github.ref_name }}
+      - uses: actions/checkout@v4
 
-      - name: Build check
+      - name: Build
         run: |
-          set -euo pipefail
-
-          if [ -n "$ENV_FILE" ]; then
-            printf '%s\n' "$ENV_FILE" > .env.production
-          fi
-
           npm ci
           npm run build
 
-      - name: Prepare deploy package
+      - name: Deploy
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH || '/var/app/production' }}
         run: |
-          set -euo pipefail
-
-          tar \
-            --exclude='.git' \
-            --exclude='.github' \
-            --exclude='node_modules' \
-            --exclude='.next' \
-            --exclude='.env.local' \
-            -czf "/tmp/portodotstack-${GITHUB_SHA}.tar.gz" .
-
-      - name: Configure SSH
-        run: |
-          set -euo pipefail
-
-          test -n "$SSH_HOST"
-          test -n "$SSH_USER"
-          test -n "$SSH_KEY"
-
           mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "$SSH_PORT" "$SSH_HOST" >> ~/.ssh/known_hosts
+          echo "$SSH_KEY" > ~/.ssh/key
+          chmod 600 ~/.ssh/key
 
-      - name: Upload package
-        run: |
-          set -euo pipefail
+          tar -czf app.tar.gz --exclude='.git' --exclude='node_modules' .
+          scp -i ~/.ssh/key -o StrictHostKeyChecking=no app.tar.gz ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/tmp/app.tar.gz
 
-          scp \
-            -P "$SSH_PORT" \
-            -i ~/.ssh/deploy_key \
-            "/tmp/portodotstack-${GITHUB_SHA}.tar.gz" \
-            "$SSH_USER@$SSH_HOST:/tmp/portodotstack-${GITHUB_SHA}.tar.gz"
-
-      - name: Deploy with Docker Compose
-        run: |
-          set -euo pipefail
-
-          RESOLVED_SERVER_NAME="${SERVER_NAME:-$DEFAULT_SERVER_NAME}"
-
-          ssh -p "$SSH_PORT" -i ~/.ssh/deploy_key "$SSH_USER@$SSH_HOST" \
-            "DEPLOY_PATH='$DEPLOY_PATH' \
-             ARCHIVE='/tmp/portodotstack-${GITHUB_SHA}.tar.gz' \
-             SERVER_NAME='$RESOLVED_SERVER_NAME' \
-             HTTP_PORT='$HTTP_PORT' \
-             COMPOSE_PROJECT_NAME='$COMPOSE_PROJECT_NAME' \
-             sh -s" <<'EOF'
-          set -e
-
-          mkdir -p "$DEPLOY_PATH"
-          tar -xzf "$ARCHIVE" -C "$DEPLOY_PATH"
-          rm -f "$ARCHIVE"
-
-          cd "$DEPLOY_PATH"
-
-          export SERVER_NAME
-          export HTTP_PORT
-          export COMPOSE_PROJECT_NAME
-
-          docker compose up -d --build --remove-orphans
-          docker image prune -f
-          EOF
+          # ใช้ตัวแปร $DEPLOY_PATH แทนที่ path เดิม
+          ssh -i ~/.ssh/key -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} \
+            "mkdir -p $DEPLOY_PATH && tar -xzf /tmp/app.tar.gz -C $DEPLOY_PATH && cd $DEPLOY_PATH && docker compose up -d --build"
