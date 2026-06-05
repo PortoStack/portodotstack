@@ -38,7 +38,6 @@ export default function RootLayout({
             {children}
           </main>
         </div>
-        <CustomCursor />
         <Toaster
           position="bottom-right"
           toastOptions={{
